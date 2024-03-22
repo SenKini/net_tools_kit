@@ -4,7 +4,6 @@
 #include <thread>
 #include <future>
 #include <sys/epoll.h>
-#include "err_code.h"
 
 namespace DevKit {
 class EventPoller {
@@ -21,10 +20,10 @@ protected:
 public:
 	EventPoller();
 	virtual ~EventPoller();
-	ErrCode addEvent(int fd, int eventType);	 // 添加事件
-	ErrCode delEvent(int fd);					 // 删除事件
-	ErrCode modifyEvent(int fd, int eventType);	 // 更改事件的监听类型
-	ErrCode startLoop();						 // 开始监听循环
-	void stopLoop();							 // 停止监听循环
+	bool addEvent(int fd, int eventType);	  // 添加事件
+	bool delEvent(int fd);					  // 删除事件
+	bool modifyEvent(int fd, int eventType);  // 更改事件的监听类型
+	void startLoop();						  // 开始监听循环
+	void stopLoop();						  // 停止监听循环
 };
 }  // namespace DevKit

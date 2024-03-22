@@ -1,3 +1,4 @@
+#pragma once
 #include <mutex>
 #include <vector>
 #include <thread>
@@ -12,17 +13,17 @@
 
 class ThreadPool {
 private:
-	std::mutex _mtx;											// äº’æ–¥é‡
-	std::condition_variable _cv;								// æ¡ä»¶å˜é‡
-	std::unordered_map<std::thread::id, std::thread> _threads;	// å­˜æ”¾çº¿ç¨‹ï¼Œé”®å€¼å¯¹çš„å½¢å¼æ–¹ä¾¿æå‰ç»“æŸå¤šä½™çº¿ç¨‹
-	std::queue<std::function<void()>> _tasks;					// å­˜æ”¾ä»»åŠ¡
-	int _maxThreadNum;											// æœ€å¤§çº¿ç¨‹æ•°
-	int _curThreadNum;											// æ­£åœ¨è¿è¡Œçš„çº¿ç¨‹
-	int _idleThreadNum;											// ç©ºé—²çš„çº¿ç¨‹
-	bool _isQuit;												// æ˜¯å¦é€€å‡º
+	std::mutex _mtx;											// »¥³âÁ¿
+	std::condition_variable _cv;								// Ìõ¼ş±äÁ¿
+	std::unordered_map<std::thread::id, std::thread> _threads;	// ´æ·ÅÏß³Ì£¬¼üÖµ¶ÔµÄĞÎÊ½·½±ãÌáÇ°½áÊø¶àÓàÏß³Ì
+	std::queue<std::function<void()>> _tasks;					// ´æ·ÅÈÎÎñ
+	int _maxThreadNum;											// ×î´óÏß³ÌÊı
+	int _curThreadNum;											// ÕıÔÚÔËĞĞµÄÏß³Ì
+	int _idleThreadNum;											// ¿ÕÏĞµÄÏß³Ì
+	bool _isQuit;												// ÊÇ·ñÍË³ö
 
-	void worker();										// æ‰§è¡Œ task
-	void joinFinishedThread(std::thread::id threadId);	// æå‰ç»“æŸå¤šä½™çš„çº¿ç¨‹
+	void worker();										// Ö´ĞĞ task
+	void joinFinishedThread(std::thread::id threadId);	// ÌáÇ°½áÊø¶àÓàµÄÏß³Ì
 
 public:
 	ThreadPool(int mtn);
@@ -30,10 +31,10 @@ public:
 	ThreadPool(const ThreadPool &) = delete;
 	ThreadPool &operator=(const ThreadPool &) = delete;
 
-	int getCurThreadNum();	// è·å–æ­£åœ¨è¿è¡Œçš„çº¿ç¨‹æ•°
+	int getCurThreadNum();	// »ñÈ¡ÕıÔÚÔËĞĞµÄÏß³ÌÊı
 
 	template <typename Func, typename... Arg>
-	auto addTask(Func &&func, Arg &&...args) {	// æ·»åŠ ä»»åŠ¡
+	auto addTask(Func &&func, Arg &&...args) {	// Ìí¼ÓÈÎÎñ
 		using ReturnType = decltype(func(args...));
 
 		auto taskFunc = std::bind(std::forward<Func>(func), std::forward<Arg>(args)...);
@@ -47,9 +48,9 @@ public:
 				(*taskPackge)();
 			});
 
-			if (_idleThreadNum > 0)	 // å¦‚æœæœ‰ç©ºé—²çº¿ç¨‹åˆ™ä¸å¿…æ–°å»ºçº¿ç¨‹
+			if (_idleThreadNum > 0)	 // Èç¹ûÓĞ¿ÕÏĞÏß³ÌÔò²»±ØĞÂ½¨Ïß³Ì
 				_cv.notify_one();
-			else if (_curThreadNum < _maxThreadNum) {  // ä¿è¯çº¿ç¨‹æ•°ä¸ä¼šè¶…è¿‡æœ€å¤§å€¼
+			else if (_curThreadNum < _maxThreadNum) {  // ±£Ö¤Ïß³ÌÊı²»»á³¬¹ı×î´óÖµ
 				std::thread t(&ThreadPool::worker, this);
 
 				_threads[t.get_id()] = std::move(t);

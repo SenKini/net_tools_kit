@@ -1,4 +1,4 @@
-#include "thread_pool.hpp"
+#include "thread_pool.h"
 
 ThreadPool::ThreadPool(int mtn)
 	: _maxThreadNum(mtn), _curThreadNum(0), _idleThreadNum(0), _isQuit(false) {}
@@ -20,8 +20,8 @@ int ThreadPool::getCurThreadNum() {
 
 void ThreadPool::worker() {
 	while (true) {
-		std::function<void()> task;	 // å•ä¸ªä»»åŠ¡
-		bool isTimeout;				 // æ˜¯å¦ç­‰å¾…è¶…æ—¶
+		std::function<void()> task;	 // µ¥¸öÈÎÎñ
+		bool isTimeout;				 // ÊÇ·ñµÈ´ı³¬Ê±
 
 		{
 			std::unique_lock ul(_mtx);
@@ -35,7 +35,7 @@ void ThreadPool::worker() {
 			if (_tasks.empty()) {
 				_curThreadNum--;
 
-				if (isTimeout)	// è¶…æ—¶è¯´æ˜çº¿ç¨‹è¿‡å¤šï¼Œå‡å°‘çº¿ç¨‹
+				if (isTimeout)	// ³¬Ê±ËµÃ÷Ïß³Ì¹ı¶à£¬¼õÉÙÏß³Ì
 					joinFinishedThread(std::this_thread::get_id());
 
 				return;
@@ -47,7 +47,7 @@ void ThreadPool::worker() {
 		}
 
 		if (task != nullptr)
-			task();	 // æ‰§è¡Œä»»åŠ¡
+			task();	 // Ö´ĞĞÈÎÎñ
 	}
 }
 

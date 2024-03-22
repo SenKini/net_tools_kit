@@ -22,35 +22,33 @@ EventPoller::~EventPoller() {
 	_isStop = true;
 }
 
-ErrCode EventPoller::addEvent(int fd, int eventType) {
+bool EventPoller::addEvent(int fd, int eventType) {
 	epoll_event ee;
-	int state;
-
 	ee.events = eventType;
 	ee.data.fd = fd;
-	state = epoll_ctl(_epollFd, EPOLL_CTL_ADD, fd, &ee);
 
-	return (state != -1) ? OK : EPOLL_ERROR;
+	int state = epoll_ctl(_epollFd, EPOLL_CTL_ADD, fd, &ee);
+
+	return (state != -1);
 }
 
-ErrCode EventPoller::delEvent(int fd) {
+bool EventPoller::delEvent(int fd) {
 	int state = epoll_ctl(_epollFd, EPOLL_CTL_DEL, fd, NULL);
 
-	return (state != -1) ? OK : EPOLL_ERROR;
+	return (state != -1);
 }
 
-ErrCode EventPoller::modifyEvent(int fd, int eventType) {
+bool EventPoller::modifyEvent(int fd, int eventType) {
 	epoll_event ee;
-	int state;
-
 	ee.events = eventType;
 	ee.data.fd = fd;
-	state = epoll_ctl(_epollFd, EPOLL_CTL_MOD, fd, &ee);
 
-	return (state != -1) ? OK : EPOLL_ERROR;
+	int state = epoll_ctl(_epollFd, EPOLL_CTL_MOD, fd, &ee);
+
+	return state != -1;
 }
 
-ErrCode EventPoller::startLoop() {
+void EventPoller::startLoop() {
 	_callbackFuture = std::async(std::launch::deferred, &EventPoller::loop, this);
 }
 
